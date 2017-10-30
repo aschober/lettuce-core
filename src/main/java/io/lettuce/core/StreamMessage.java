@@ -18,24 +18,40 @@ package io.lettuce.core;
 import java.util.Map;
 
 /**
+ * A stream message and its id.
+ *
  * @author Mark Paluch
  * @since 4.5
  */
 public class StreamMessage<K, V> {
 
+    private final K stream;
     private final String id;
-    private final Map<K, V> hash;
+    private final Map<K, V> body;
 
-    public StreamMessage(String id, Map<K, V> hash) {
+    /**
+     * Create a new {@link StreamMessage}.
+     *
+     * @param stream the stream.
+     * @param id the message id.
+     * @param body map containing the message body.
+     */
+    public StreamMessage(K stream, String id, Map<K, V> body) {
+
+        this.stream = stream;
         this.id = id;
-        this.hash = hash;
+        this.body = body;
+    }
+
+    public K getStream() {
+        return stream;
     }
 
     public String getId() {
         return id;
     }
 
-    public Map<K, V> getHash() {
-        return hash;
+    public Map<K, V> getBody() {
+        return body;
     }
 }

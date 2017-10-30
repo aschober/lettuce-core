@@ -1470,6 +1470,46 @@ public abstract class AbstractRedisAsyncCommands<K, V> implements RedisHashAsync
     }
 
     @Override
+    public RedisFuture<String> xadd(K key, Map<K, V> body) {
+        return dispatch(commandBuilder.xadd(key, null, body));
+    }
+
+    @Override
+    public RedisFuture<String> xadd(K key, XAddArgs args, Map<K, V> body) {
+        return dispatch(commandBuilder.xadd(key, args, body));
+    }
+
+    @Override
+    public RedisFuture<String> xadd(K key, Object... keysAndValues) {
+        return dispatch(commandBuilder.xadd(key, null, keysAndValues));
+    }
+
+    @Override
+    public RedisFuture<String> xadd(K key, XAddArgs args, Object... keysAndValues) {
+        return dispatch(commandBuilder.xadd(key, args, keysAndValues));
+    }
+
+    @Override
+    public RedisFuture<List<StreamMessage<K, V>>> xrange(K key, Range<String> range) {
+        return dispatch(commandBuilder.xrange(key, range, Limit.unlimited()));
+    }
+
+    @Override
+    public RedisFuture<List<StreamMessage<K, V>>> xrange(K key, Range<String> range, Limit limit) {
+        return dispatch(commandBuilder.xrange(key, range, limit));
+    }
+
+    @Override
+    public RedisFuture<List<StreamMessage<K, V>>> xread(XReadArgs.Stream<K>... streams) {
+        return dispatch(commandBuilder.xread(streams, null));
+    }
+
+    @Override
+    public RedisFuture<List<StreamMessage<K, V>>> xread(XReadArgs args, XReadArgs.Stream<K>... streams) {
+        return dispatch(commandBuilder.xread(streams, args));
+    }
+
+    @Override
     public RedisFuture<Long> zadd(K key, double score, V member) {
         return dispatch(commandBuilder.zadd(key, null, score, member));
     }

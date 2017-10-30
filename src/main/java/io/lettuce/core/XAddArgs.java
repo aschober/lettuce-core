@@ -29,6 +29,20 @@ public class XAddArgs {
     private String id;
     private Long maxlen;
 
+    public static class Builder {
+
+        /**
+         * Utility constructor.
+         */
+        private Builder() {
+
+        }
+
+        public static XAddArgs maxlen(long count) {
+            return new XAddArgs().maxlen(count);
+        }
+    }
+
     /**
      * Limit results to {@code maxlen} entries.
      *
@@ -42,12 +56,12 @@ public class XAddArgs {
     }
 
     /**
-     * Limit results to {@code maxlen} entries.
+     * Limit stream to {@code maxlen} entries.
      *
-     * @param count number greater 0
+     * @param maxlen number greater 0.
      * @return {@code this}
      */
-    public XAddArgs withMaxlen(long maxlen) {
+    public XAddArgs maxlen(long maxlen) {
         LettuceAssert.isTrue(maxlen > 0, "Maxlen must be greater 0");
         this.maxlen = maxlen;
         return this;

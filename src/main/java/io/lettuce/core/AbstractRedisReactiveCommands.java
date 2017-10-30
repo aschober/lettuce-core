@@ -1483,6 +1483,46 @@ public abstract class AbstractRedisReactiveCommands<K, V> implements RedisHashRe
     }
 
     @Override
+    public Mono<String> xadd(K key, Map<K, V> body) {
+        return createMono(() -> commandBuilder.xadd(key, null, body));
+    }
+
+    @Override
+    public Mono<String> xadd(K key, XAddArgs args, Map<K, V> body) {
+        return createMono(() -> commandBuilder.xadd(key, args, body));
+    }
+
+    @Override
+    public Mono<String> xadd(K key, Object... keysAndValues) {
+        return createMono(() -> commandBuilder.xadd(key, null, keysAndValues));
+    }
+
+    @Override
+    public Mono<String> xadd(K key, XAddArgs args, Object... keysAndValues) {
+        return createMono(() -> commandBuilder.xadd(key, args, keysAndValues));
+    }
+
+    @Override
+    public Flux<StreamMessage<K, V>> xrange(K key, Range<String> range) {
+        return createDissolvingFlux(() -> commandBuilder.xrange(key, range, Limit.unlimited()));
+    }
+
+    @Override
+    public Flux<StreamMessage<K, V>> xrange(K key, Range<String> range, Limit limit) {
+        return createDissolvingFlux(() -> commandBuilder.xrange(key, range, limit));
+    }
+
+    @Override
+    public Flux<StreamMessage<K, V>> xread(XReadArgs.Stream<K>... streams) {
+        return createDissolvingFlux(() -> commandBuilder.xread(streams, null));
+    }
+
+    @Override
+    public Flux<StreamMessage<K, V>> xread(XReadArgs args, XReadArgs.Stream<K>... streams) {
+        return createDissolvingFlux(() -> commandBuilder.xread(streams, args));
+    }
+
+    @Override
     public Mono<Long> zadd(K key, double score, V member) {
         return createMono(() -> commandBuilder.zadd(key, null, score, member));
     }

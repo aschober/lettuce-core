@@ -16,8 +16,6 @@
 package io.lettuce.core;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
 import io.lettuce.core.internal.LettuceAssert;
 import io.lettuce.core.protocol.CommandArgs;
@@ -33,62 +31,161 @@ public class XReadArgs {
     private Long block;
     private Long count;
     private Group group;
-    private final List<String> streamOffsetId = new ArrayList<>();
+
+    public static class Builder {
+
+        /**
+         * Utility constructor.
+         */
+        private Builder() {
+
+        }
+
+        public static XReadArgs block(long milliseconds) {
+            return new XReadArgs().block(milliseconds);
+        }
+
+        public static XReadArgs count(long count) {
+            return new XReadArgs().count(count);
+        }
+
+        public static XReadArgs group(Group group) {
+            return new XReadArgs().group(group);
+        }
+    }
 
     /**
-     * Limit results to {@code maxlen} entries.
+     * Wait up to {@code milliseconds} for a new stream message.
      *
-     * @param id must not be {@literal null}.
-     * @return {@code this}
+     * @param milliseconds max time to wait.
+     * @return {@code this}.
      */
-    public XReadArgs id(String id) {
-        LettuceAssert.notNull(id, "Id must not be null");
-        this.id = id;
+    public XReadArgs block(long milliseconds) {
+        this.block = milliseconds;
         return this;
     }
 
     /**
-     * Limit results to {@code maxlen} entries.
+     * Limit read to {@code count} messages.
      *
-     * @param count number greater 0
-     * @return {@code this}
+     * @param count number of messages.
+     * @return {@code this}.
      */
-    public XReadArgs withMaxlen(long maxlen) {
-        LettuceAssert.isTrue(maxlen > 0, "Maxlen must be greater 0");
-        this.maxlen = maxlen;
+    public XReadArgs count(long count) {
+        this.count = count;
         return this;
     }
 
-    public List<String> getStreamOffsetId() {
-        return streamOffsetId;
+    /**
+     * Associate a consumer {@link Group} with this read.
+     *
+     * @param group the consumer group, must not be {@literal null}.
+     * @return {@code this}.
+     */
+    public XReadArgs group(Group group) {
+        LettuceAssert.notNull(group, "Group must not be null");
+        this.group = group;
+        return this;
     }
 
     public <K, V> void build(CommandArgs<K, V> args) {
-        if (maxlen != null) {
-            args.add(CommandKeyword.MAXLEN).add(maxlen);
+
+        if (block != null) {
+            args.add(CommandKeyword.BLOCK).add(block);
         }
 
+        if (count != null) {
+            args.add(CommandKeyword.COUNT).add(count);
+        }
+
+        if (group != null) {
+            args.add(CommandKeyword.GROUP).add(group.name).add(group.ttl);
+        }
     }
 
-    static class Group {
+    /**
+     * Value object representing a Stream consumer group.
+     */
+    public static class Group {
 
         final String name;
-        final Duration ttl;
+        final long ttl;
 
-        public Group(String name, Duration ttl) {
+        private Group(String name, long ttl) {
             this.name = name;
             this.ttl = ttl;
         }
-    }
 
-    static class Retry {
+        /**
+         * Create a new consumer group.
+         *
+         * @param name must not be {@literal null} or empty.
+         * @param ttl must not be {@literal null}.
+         * @return the consumer {@link Group} object.
+         */
+        public static Group from(String name, Duration ttl) {
 
-        final Duration retry;
-        final Duration expire;
+            LettuceAssert.notEmpty(name, "Name must not be empty");
+            LettuceAssert.notNull(ttl, "TTL must not be null");
 
-        public Retry(Duration retry, Duration expire) {
-            this.retry = retry;
-            this.expire = expire;
+            return new Group(name, ttl.toMillis());
+        }
+
+        /**
+         * Create a new consumer group.
+         *
+         * @param name must not be {@literal null} or empty.
+         * @param ttlMillis time to live in {@link java.util.concurrent.TimeUnit#MILLISECONDS}.
+         * @return the consumer {@link Group} object.
+         */
+        public static Group from(String name, long ttlMillis) {
+
+            LettuceAssert.notEmpty(name, "Name must not be empty");
+
+            return new Group(name, ttlMillis);
         }
     }
+
+    /**
+     * Value object representing a Stream consumer group.
+     */
+    public static class Stream<K> {
+
+        final K name;
+        final String offset;
+
+        private Stream(K name, String offset) {
+            this.name = name;
+            this.offset = offset;
+        }
+
+        /**
+         * Read all new arriving elements from the stream identified by {@code name}.
+         *
+         * @param name must not be {@literal null}.
+         * @return the {@link Stream} object without a specific offset.
+         */
+        public static <K> Stream<K> from(K name) {
+
+            LettuceAssert.notNull(name, "Stream must not be null");
+
+            return new Stream<>(name, "$");
+        }
+
+        /**
+         * Read all arriving elements from the stream identified by {@code name} starting at {@code offset}.
+         *
+         * @param name must not be {@literal null}.
+         * @param offset the stream offset.
+         * @return the {@link Stream} object without a specific offset.
+         */
+        public static <K> Stream<K> from(K name, String offset) {
+
+            LettuceAssert.notNull(name, "Stream must not be null");
+            LettuceAssert.notEmpty(offset, "Offset must not be empty");
+
+            return new Stream<>(name, offset);
+        }
+    }
+
 }
