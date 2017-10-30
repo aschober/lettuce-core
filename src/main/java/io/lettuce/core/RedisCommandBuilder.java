@@ -2033,6 +2033,21 @@ class RedisCommandBuilder<K, V> extends BaseRedisCommandBuilder<K, V> {
         CommandArgs<K, V> args = new CommandArgs<>(codec).addKeys(keys);
         return createCommand(WATCH, new StatusOutput<>(codec), args);
     }
+    
+    public Command<K, V, String> xadd(K key, Map<K, V> map, XAddArgs xAddArgs) {
+        notNullKey(key);
+        LettuceAssert.notNull(map, "Key/Values " + MUST_NOT_BE_NULL);
+
+        CommandArgs<K, V> args = new CommandArgs<K, V>(codec).addKey(key);
+
+        if (xAddArgs != null) {
+            xAddArgs.build(args);
+        }
+
+        args.add(map);
+
+        return createCommand(XADD, new StatusOutput<K, V>(codec), args);
+    }
 
     Command<K, V, Long> zadd(K key, ZAddArgs zAddArgs, double score, V member) {
         notNullKey(key);
@@ -2770,7 +2785,7 @@ class RedisCommandBuilder<K, V> extends BaseRedisCommandBuilder<K, V> {
 
         return allocated.array();
     }
-
+    
     static void notNull(ScoredValueStreamingChannel<?> channel) {
         LettuceAssert.notNull(channel, "ScoredValueStreamingChannel " + MUST_NOT_BE_NULL);
     }

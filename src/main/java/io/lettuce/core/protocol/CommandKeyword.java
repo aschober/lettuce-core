@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 the original author or authors.
+ * Copyright 2011-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package io.lettuce.core.protocol;
  * Keyword modifiers for redis commands.
  *
  * @author Will Glozer
+ * @author Mark Paluch
  */
 public enum CommandKeyword implements ProtocolKeyword {
 
@@ -26,7 +27,7 @@ public enum CommandKeyword implements ProtocolKeyword {
 
     FAILOVER, FORGET, FLUSH, FORCE, FLUSHSLOTS, GETNAME, GETKEYSINSLOT, HTSTATS, ID, IDLETIME, KILL, KEYSLOT, LEN, LIMIT, LIST, LOAD, MATCH,
 
-    MAX, MEET, MIN, MOVED, NO, NODE, NODES, NOSAVE, NOT, NUMSUB, NUMPAT, ONE, OR, PAUSE, REFCOUNT, REMOVE, RELOAD, REPLACE, REPLICATE, RESET,
+    MAX, MAXLEN, MEET, MIN, MOVED, NO, NODE, NODES, NOSAVE, NOT, NUMSUB, NUMPAT, ONE, OR, PAUSE, REFCOUNT, REMOVE, RELOAD, REPLACE, REPLICATE, RESET,
 
     RESETSTAT, RESTART, REWRITE, SAVECONFIG, SDSLEN, SETNAME, SETSLOT, SLOTS, STABLE, MIGRATING, IMPORTING, SKIPME, SLAVES, STORE, SUM, SEGFAULT, WEIGHTS,
 
@@ -34,7 +35,7 @@ public enum CommandKeyword implements ProtocolKeyword {
 
     public final byte[] bytes;
 
-    private CommandKeyword() {
+    CommandKeyword() {
         bytes = name().getBytes(LettuceCharsets.ASCII);
     }
 
