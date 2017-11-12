@@ -84,7 +84,7 @@ public enum CommandType implements ProtocolKeyword {
 
     // Stream
 
-    XADD, XRANGE, XLEN, XREAD,
+    XADD, XLEN, XRANGE, XREAD,
 
     // Others
     TIME, WAIT,

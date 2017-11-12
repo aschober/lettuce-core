@@ -71,6 +71,14 @@ public interface NodeSelectionStreamAsyncCommands<K, V> {
     AsyncExecutions<String> xadd(K key, XAddArgs args, Object... keysAndValues);
 
     /**
+     * Get the length of a steam.
+     *
+     * @param key the stream key.
+     * @return simple-reply the lenght of the stream.
+     */
+    AsyncExecutions<Long> xlen(K key);
+
+    /**
      * Read messages from a stream within a specific {@link Range}.
      *
      * @param key the stream key.

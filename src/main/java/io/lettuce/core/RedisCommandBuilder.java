@@ -2077,6 +2077,14 @@ class RedisCommandBuilder<K, V> extends BaseRedisCommandBuilder<K, V> {
         return createCommand(XADD, new StatusOutput<>(codec), args);
     }
 
+    public Command<K, V, Long> xlen(K key) {
+        notNullKey(key);
+
+        CommandArgs<K, V> args = new CommandArgs<>(codec).addKey(key);
+
+        return createCommand(XLEN, new IntegerOutput<>(codec), args);
+    }
+
     public Command<K, V, List<StreamMessage<K, V>>> xrange(K key, Range<String> range, Limit limit) {
         notNullKey(key);
         LettuceAssert.notNull(range, "Range  " + MUST_NOT_BE_NULL);

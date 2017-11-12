@@ -1503,6 +1503,11 @@ public abstract class AbstractRedisReactiveCommands<K, V> implements RedisHashRe
     }
 
     @Override
+    public Mono<Long> xlen(K key) {
+        return createMono(() -> commandBuilder.xlen(key));
+    }
+
+    @Override
     public Flux<StreamMessage<K, V>> xrange(K key, Range<String> range) {
         return createDissolvingFlux(() -> commandBuilder.xrange(key, range, Limit.unlimited()));
     }

@@ -37,6 +37,8 @@ public class StreamCommandTest extends AbstractRedisClientTest {
 
         assertThat(redis.xadd(key, Collections.singletonMap("key", "value"))).endsWith("-0");
         assertThat(redis.xadd(key, "foo", "bar")).isNotEmpty();
+
+        assertThat(redis.xlen(key)).isEqualTo(2);
     }
 
     @Test
