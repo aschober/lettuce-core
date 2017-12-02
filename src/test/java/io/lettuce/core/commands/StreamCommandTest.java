@@ -17,10 +17,7 @@ package io.lettuce.core.commands;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.junit.Test;
 
@@ -59,13 +56,14 @@ public class StreamCommandTest extends AbstractRedisClientTest {
     @Test
     public void xrange() {
 
-        Map<String, String> body = new HashMap<>();
-        body.put("key-1", "value-1");
-        body.put("key-2", "value-2");
-
+        List<String> ids = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
 
-            redis.xadd(key, body);
+            Map<String, String> body = new HashMap<>();
+            body.put("key-1", "value-1-" + i);
+            body.put("key-2", "value-2-" + i);
+
+            ids.add(redis.xadd(key, body));
         }
 
         List<StreamMessage<String, String>> messages = redis.xrange(key, Range.unbounded());
@@ -73,11 +71,46 @@ public class StreamCommandTest extends AbstractRedisClientTest {
 
         StreamMessage<String, String> message = messages.get(0);
 
+        Map<String, String> expectedBody = new HashMap<>();
+        expectedBody.put("key-1", "value-1-0");
+        expectedBody.put("key-2", "value-2-0");
+
         assertThat(message.getId()).contains("-");
         assertThat(message.getStream()).isEqualTo(key);
-        assertThat(message.getBody()).isEqualTo(body);
+        assertThat(message.getBody()).isEqualTo(expectedBody);
 
         assertThat(redis.xrange(key, Range.unbounded(), Limit.from(2))).hasSize(2);
+
+        List<StreamMessage<String, String>> range = redis.xrange(key, Range.create(ids.get(0), ids.get(1)));
+
+        assertThat(range).hasSize(2);
+        assertThat(range.get(0).getBody()).isEqualTo(expectedBody);
+    }
+
+    @Test
+    public void xrevrange() {
+
+        for (int i = 0; i < 5; i++) {
+
+            Map<String, String> body = new HashMap<>();
+            body.put("key-1", "value-1-" + i);
+            body.put("key-2", "value-2-" + i);
+
+            redis.xadd(key, body);
+        }
+
+        List<StreamMessage<String, String>> messages = redis.xrevrange(key, Range.unbounded());
+        assertThat(messages).hasSize(5);
+
+        StreamMessage<String, String> message = messages.get(0);
+
+        Map<String, String> expectedBody = new HashMap<>();
+        expectedBody.put("key-1", "value-1-4");
+        expectedBody.put("key-2", "value-2-4");
+
+        assertThat(message.getId()).contains("-");
+        assertThat(message.getStream()).isEqualTo(key);
+        assertThat(message.getBody()).isEqualTo(expectedBody);
     }
 
     @Test

@@ -1518,6 +1518,16 @@ public abstract class AbstractRedisReactiveCommands<K, V> implements RedisHashRe
     }
 
     @Override
+    public Flux<StreamMessage<K, V>> xrevrange(K key, Range<String> range) {
+        return createDissolvingFlux(() -> commandBuilder.xrevrange(key, range, Limit.unlimited()));
+    }
+ 
+    @Override
+    public Flux<StreamMessage<K, V>> xrevrange(K key, Range<String> range, Limit limit) {
+        return createDissolvingFlux(() -> commandBuilder.xrevrange(key, range, limit));
+    }
+
+    @Override
     public Flux<StreamMessage<K, V>> xread(XReadArgs.Stream<K>... streams) {
         return createDissolvingFlux(() -> commandBuilder.xread(streams, null));
     }

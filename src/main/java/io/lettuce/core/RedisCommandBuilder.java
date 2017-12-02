@@ -2092,23 +2092,47 @@ class RedisCommandBuilder<K, V> extends BaseRedisCommandBuilder<K, V> {
 
         CommandArgs<K, V> args = new CommandArgs<>(codec).addKey(key);
 
-        if (range.getLower().equals(Boundary.unbounded())) {
-            args.add("-");
-        } else {
-            args.add(range.getLower().getValue());
-        }
-
-        if (range.getUpper().equals(Boundary.unbounded())) {
-            args.add("+");
-        } else {
-            args.add(range.getUpper().getValue());
-        }
+        args.add(getLowerValue(range)).add(getUpperValue(range));
 
         if (limit.isLimited()) {
             args.add(COUNT).add(limit.getCount());
         }
 
         return createCommand(XRANGE, new StreamRangeOutput<>(codec, key), args);
+    }
+
+    public Command<K, V, List<StreamMessage<K, V>>> xrevrange(K key, Range<String> range, Limit limit) {
+        notNullKey(key);
+        LettuceAssert.notNull(range, "Range  " + MUST_NOT_BE_NULL);
+        LettuceAssert.notNull(limit, "Limit  " + MUST_NOT_BE_NULL);
+
+        CommandArgs<K, V> args = new CommandArgs<>(codec).addKey(key);
+
+        args.add(getUpperValue(range)).add(getLowerValue(range));
+
+        if (limit.isLimited()) {
+            args.add(COUNT).add(limit.getCount());
+        }
+
+        return createCommand(XREVRANGE, new StreamRangeOutput<>(codec, key), args);
+    }
+
+    private static String getLowerValue(Range<String> range) {
+
+        if (range.getLower().equals(Boundary.unbounded())) {
+            return "-";
+        }
+
+        return range.getLower().getValue();
+    }
+
+    private static String getUpperValue(Range<String> range) {
+
+        if (range.getUpper().equals(Boundary.unbounded())) {
+            return "+";
+        }
+
+        return range.getUpper().getValue();
     }
 
     public Command<K, V, List<StreamMessage<K, V>>> xread(Stream<K>[] streams, XReadArgs xReadArgs) {

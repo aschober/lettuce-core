@@ -100,6 +100,25 @@ public interface RedisStreamReactiveCommands<K, V> {
     Flux<StreamMessage<K, V>> xrange(K key, Range<String> range, Limit limit);
 
     /**
+     * Read messages from a stream within a specific {@link Range} in reverse order.
+     *
+     * @param key the stream key.
+     * @param range must not be {@literal null}.
+     * @return StreamMessage array-reply list with members of the resulting stream.
+     */
+    Flux<StreamMessage<K, V>> xrevrange(K key, Range<String> range);
+
+    /**
+     * Read messages from a stream within a specific {@link Range} applying a {@link Limit} in reverse order.
+     *
+     * @param key the stream key.
+     * @param range must not be {@literal null}.
+     * @param limit must not be {@literal null}.
+     * @return StreamMessage array-reply list with members of the resulting stream.
+     */
+    Flux<StreamMessage<K, V>> xrevrange(K key, Range<String> range, Limit limit);
+
+    /**
      * Read messages from one or more {@link Stream}s.
      *
      * @param streams the streams to read from.

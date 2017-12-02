@@ -1505,6 +1505,16 @@ public abstract class AbstractRedisAsyncCommands<K, V> implements RedisHashAsync
     }
 
     @Override
+    public RedisFuture<List<StreamMessage<K, V>>> xrevrange(K key, Range<String> range) {
+        return dispatch(commandBuilder.xrevrange(key, range, Limit.unlimited()));
+    }
+
+    @Override
+    public RedisFuture<List<StreamMessage<K, V>>> xrevrange(K key, Range<String> range, Limit limit) {
+        return dispatch(commandBuilder.xrevrange(key, range, limit));
+    }
+
+    @Override
     public RedisFuture<List<StreamMessage<K, V>>> xread(XReadArgs.Stream<K>... streams) {
         return dispatch(commandBuilder.xread(streams, null));
     }
